@@ -1,36 +1,46 @@
 <?php
 if (!defined('APP_ACCESS')) {
     http_response_code(403);
-    exit('Прямой доступ запрещен');
+    exit('Доступ запрещен');
 }
 
-function renderMenu($activeAction = 'view', $activeSort = 'id') {
-    $mainItems = [
+function getMenu() {
+    $current = $_GET['p'] ?? 'view';
+    if (!in_array($current, ['view', 'add', 'edit', 'delete'])) {
+        $current = 'view';
+    }
+
+    $sort = $_GET['sort'] ?? 'id';
+    if (!in_array($sort, ['id', 'surname', 'date'])) {
+        $sort = 'id';
+    }
+
+    $items = [
         'view'   => 'Просмотр',
         'add'    => 'Добавление записи',
         'edit'   => 'Редактирование записи',
         'delete' => 'Удаление записи'
     ];
 
-    $html = '<nav class="main-menu">';
-    foreach ($mainItems as $key => $label) {
-        $activeClass = ($activeAction === $key) ? ' active' : '';
-        $html .= '<a href="index.php?action=' . $key . '" class="menu-btn' . $activeClass . '">' . $label . '</a>';
+    $html = '<header>';
+    foreach ($items as $key => $title) {
+        $class = ($current === $key) ? ' class="select"' : '';
+        $html .= '<a href="index.php?p=' . $key . '"' . $class . '>' . $title . '</a>';
     }
-    $html .= '</nav>';
+    $html .= '</header>';
 
-    if ($activeAction === 'view') {
-        $sortItems = [
-            'id'        => 'По порядку добавления',
-            'surname'   => 'По фамилии',
-            'birthdate' => 'По дате рождения'
+    if ($current === 'view') {
+        $subItems = [
+            'id'      => 'По порядку добавления',
+            'surname' => 'По фамилии',
+            'date'    => 'По дате рождения'
         ];
-        $html .= '<nav class="sub-menu">';
-        foreach ($sortItems as $sKey => $sLabel) {
-            $subActiveClass = ($activeSort === $sKey) ? ' active' : '';
-            $html .= '<a href="index.php?action=view&sort=' . $sKey . '" class="submenu-btn' . $subActiveClass . '">' . $sLabel . '</a>';
+        $html .= '<div class="submenu">';
+        foreach ($subItems as $sKey => $sTitle) {
+            $sClass = ($sort === $sKey) ? ' class="select"' : '';
+            $html .= '<a href="index.php?p=view&sort=' . $sKey . '"' . $sClass . '>' . $sTitle . '</a>';
         }
-        $html .= '</nav>';
+        $html .= '</div>';
     }
 
     return $html;

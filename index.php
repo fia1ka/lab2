@@ -3,19 +3,17 @@ define('APP_ACCESS', true);
 require_once 'db.php';
 require_once 'menu.php';
 
-$action = $_GET['action'] ?? 'view';
-$allowed_actions = ['view', 'add', 'edit', 'delete'];
-if (!in_array($action, $allowed_actions)) {
-    $action = 'view';
+$pageType = $_GET['p'] ?? 'view';
+if (!in_array($pageType, ['view', 'add', 'edit', 'delete'])) {
+    $pageType = 'view';
 }
 
 $sort = $_GET['sort'] ?? 'id';
-$allowed_sorts = ['id', 'surname', 'birthdate'];
-if (!in_array($sort, $allowed_sorts)) {
+if (!in_array($sort, ['id', 'surname', 'date'])) {
     $sort = 'id';
 }
 
-$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$pageNum = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -26,24 +24,24 @@ $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 </head>
 <body>
 
-<header>
-    <?= renderMenu($action, $sort) ?>
-</header>
+<?= getMenu() ?>
 
 <main>
     <?php
-    if ($action === 'view') {
+    if ($pageType === 'view') {
         require_once 'viewer.php';
-        echo renderContacts($pdo, $sort, $page);
-    } elseif ($action === 'add') {
+        echo getContactsTable($pdo, $sort, $pageNum);
+    } elseif ($pageType === 'add') {
         require_once 'add.php';
-    } elseif ($action === 'edit') {
+    } elseif ($pageType === 'edit') {
         require_once 'edit.php';
-    } elseif ($action === 'delete') {
+    } elseif ($pageType === 'delete') {
         require_once 'delete.php';
     }
     ?>
 </main>
+
+<footer></footer>
 
 </body>
 </html>
